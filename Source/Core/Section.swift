@@ -513,7 +513,7 @@ open class BaseMultivaluedSection: Section {
     }
     #endif
 
-    func initialize() {
+    open func initialize() {
         // Overridden by subclasses
     }
 
@@ -550,13 +550,8 @@ open class GenericMultivaluedSection<AddButtonType: RowType>: BaseMultivaluedSec
     }
     #endif
 
-    override func initialize() {
+    override open func initialize() {
         let addRow = addButtonProvider(self)
-        addRow.onCellSelection { cell, row in
-            guard !row.isDisabled else { return }
-            guard let tableView = cell.formViewController()?.tableView, let indexPath = row.indexPath else { return }
-            cell.formViewController()?.tableView(tableView, commit: .insert, forRowAt: indexPath)
-        }
         self <<< addRow
     }
 
@@ -567,7 +562,7 @@ open class GenericMultivaluedSection<AddButtonType: RowType>: BaseMultivaluedSec
  */
 open class MultivaluedSection: GenericMultivaluedSection<ButtonRow> {
 
-    override func initialize() {
+    override open func initialize() {
         if addButtonProvider == nil {
             addButtonProvider = { _ in
                 return ButtonRow {
@@ -577,6 +572,11 @@ open class MultivaluedSection: GenericMultivaluedSection<ButtonRow> {
                         cell.textLabel?.textAlignment = .left
                 }
             }
+        }
+        addButtonProvider(self).onCellSelection { cell, row in
+            guard !row.isDisabled else { return }
+            guard let tableView = cell.formViewController()?.tableView, let indexPath = row.indexPath else { return }
+            cell.formViewController()?.tableView(tableView, commit: .insert, forRowAt: indexPath)
         }
         super.initialize()
     }
